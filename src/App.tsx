@@ -24,7 +24,7 @@ const AppContent = () => {
   } = useCart();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Header cartCount={getCartCount()} />
       
       <main>
@@ -45,13 +45,39 @@ const AppContent = () => {
         </Routes>
       </main>
 
-      <footer className="bg-blue-600 text-white py-8 mt-16">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-lg font-semibold mb-2">ElectroShop Kenya</p>
-          <p className="text-blue-200">Your trusted electronics partner since 2020</p>
-          <div className="mt-4 text-sm text-blue-200">
-            <p>Email: support@electroshop.co.ke | Phone: +254 712 345 678</p>
-            <p className="mt-2">&copy; 2025 ElectroShop Kenya. All rights reserved.</p>
+      <footer className="bg-accent text-accent-foreground py-12 mt-16">
+        <div className="container mx-auto px-4">
+          <div className="grid md:grid-cols-3 gap-8 text-center md:text-left">
+            <div>
+              <h3 className="text-xl font-bold mb-4 flex items-center justify-center md:justify-start">
+                🇰🇪 ElectroShop Kenya
+              </h3>
+              <p className="text-accent-foreground/80">
+                Your trusted electronics partner since 2020. 
+                Serving customers across all 47 counties of Kenya.
+              </p>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Quick Links</h4>
+              <div className="space-y-2 text-accent-foreground/80">
+                <p>🛍️ Shop Electronics</p>
+                <p>💳 M-Pesa Payments</p>
+                <p>🚚 Delivery Info</p>
+                <p>⭐ Customer Reviews</p>
+              </div>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Contact Us</h4>
+              <div className="space-y-2 text-accent-foreground/80">
+                <p>📧 support@electroshop.co.ke</p>
+                <p>📱 +254 712 345 678</p>
+                <p>💰 M-Pesa: 0704137949</p>
+                <p>🏢 Nairobi, Kenya</p>
+              </div>
+            </div>
+          </div>
+          <div className="border-t border-accent-foreground/20 mt-8 pt-8 text-center text-accent-foreground/60">
+            <p>&copy; 2025 ElectroShop Kenya. All rights reserved. Made with ❤️ for Kenya.</p>
           </div>
         </div>
       </footer>

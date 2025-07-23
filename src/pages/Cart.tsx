@@ -1,9 +1,11 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import CartItemComponent, { CartItem } from '@/components/CartItem';
+import MpesaPayment from '@/components/MpesaPayment';
 import { ShoppingBag, ArrowLeft } from 'lucide-react';
 
 interface CartProps {
@@ -14,6 +16,15 @@ interface CartProps {
 }
 
 const Cart = ({ cartItems, onUpdateQuantity, onRemoveFromCart, cartTotal }: CartProps) => {
+  const [showMpesaPayment, setShowMpesaPayment] = useState(false);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
+
+  const handlePaymentSuccess = () => {
+    setPaymentSuccess(true);
+    setShowMpesaPayment(false);
+    // Clear cart after successful payment
+    cartItems.forEach(item => onRemoveFromCart(item.id));
+  };
   if (cartItems.length === 0) {
     return (
       <div className="container mx-auto px-4 py-16">
@@ -84,8 +95,12 @@ const Cart = ({ cartItems, onUpdateQuantity, onRemoveFromCart, cartTotal }: Cart
                 </div>
               </div>
 
-              <Button className="w-full mt-6" size="lg">
-                Proceed to Checkout
+              <Button 
+                className="w-full mt-6 bg-mpesa hover:bg-mpesa/90 text-mpesa-foreground" 
+                size="lg"
+                onClick={() => setShowMpesaPayment(true)}
+              >
+                Pay with M-Pesa
               </Button>
 
               <p className="text-xs text-gray-500 text-center mt-4">
@@ -95,6 +110,47 @@ const Cart = ({ cartItems, onUpdateQuantity, onRemoveFromCart, cartTotal }: Cart
           </Card>
         </div>
       </div>
+
+      {/* M-Pesa Payment Dialog */}
+      <Dialog open={showMpesaPayment} onOpenChange={setShowMpesaPayment}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="sr-only">M-Pesa Payment</DialogTitle>
+          </DialogHeader>
+          <MpesaPayment 
+            amount={cartTotal}
+            onPaymentSuccess={handlePaymentSuccess}
+            onCancel={() => setShowMpesaPayment(false)}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Payment Success Message */}
+      {paymentSuccess && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <Card className="w-full max-w-md mx-4 animate-scale-in">
+            <CardContent className="p-8 text-center">
+              <div className="mb-4">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Order Confirmed! 🎉</h2>
+                <p className="text-gray-600 mb-6">
+                  Thank you for your purchase. Your order has been confirmed and will be processed shortly.
+                </p>
+                <Button 
+                  onClick={() => setPaymentSuccess(false)}
+                  className="w-full"
+                >
+                  Continue Shopping
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 };
