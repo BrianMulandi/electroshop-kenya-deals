@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Smartphone, CheckCircle, Clock, AlertCircle } from 'lucide-react';
+import { Smartphone, CheckCircle, Clock, AlertCircle, Shield } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface MpesaPaymentProps {
@@ -35,18 +35,35 @@ const MpesaPayment: React.FC<MpesaPaymentProps> = ({ amount, onPaymentSuccess, o
 
     setPaymentStatus('processing');
     
-    // Simulate M-Pesa payment process
+    // Simulate M-Pesa payment process with realistic prompts
+    setPaymentStatus('processing');
+    
+    // First show "Check your phone" message
+    toast({
+      title: "M-Pesa Prompt Sent",
+      description: "Please check your phone for M-Pesa STK push notification",
+    });
+    
+    // After 3 seconds, show PIN entry simulation
+    setTimeout(() => {
+      toast({
+        title: "Enter Your M-Pesa PIN",
+        description: "A prompt has appeared on your phone. Enter your 4-digit M-Pesa PIN to complete the transaction.",
+      });
+    }, 2000);
+    
+    // After 6 seconds, show completion
     setTimeout(() => {
       setPaymentStatus('success');
       toast({
-        title: "Payment Successful! 🎉",
+        title: "Payment Successful!",
         description: `KSh ${amount.toLocaleString()} has been paid successfully via M-Pesa`,
       });
       
       setTimeout(() => {
         onPaymentSuccess();
       }, 2000);
-    }, 3000);
+    }, 6000);
   };
 
   const formatPhoneNumber = (value: string) => {
@@ -146,11 +163,20 @@ const MpesaPayment: React.FC<MpesaPaymentProps> = ({ amount, onPaymentSuccess, o
           </div>
 
           {paymentStatus === 'processing' && (
-            <div className="flex items-center justify-center space-x-2 py-4">
-              <Clock className="w-5 h-5 text-orange-500 animate-bounce-gentle" />
-              <span className="text-orange-600 font-medium">
-                Processing payment... Please check your phone for M-Pesa prompt
-              </span>
+            <div className="space-y-3 py-4">
+              <div className="flex items-center justify-center space-x-2">
+                <Clock className="w-5 h-5 text-orange-500 animate-bounce-gentle" />
+                <span className="text-orange-600 font-medium">
+                  Processing M-Pesa payment...
+                </span>
+              </div>
+              <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                <p className="text-sm text-orange-800 text-center">
+                  <strong>Step 1:</strong> Check your phone for STK push notification<br/>
+                  <strong>Step 2:</strong> Enter your 4-digit M-Pesa PIN<br/>
+                  <strong>Step 3:</strong> Confirm the transaction
+                </p>
+              </div>
             </div>
           )}
 
@@ -176,9 +202,10 @@ const MpesaPayment: React.FC<MpesaPaymentProps> = ({ amount, onPaymentSuccess, o
 
         {/* Trust indicators */}
         <div className="text-center pt-4 border-t">
-          <p className="text-xs text-gray-500">
-            🔒 Secured by M-Pesa • Trusted by millions of Kenyans
-          </p>
+          <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
+            <Shield className="w-3 h-3" />
+            <span>Secured by M-Pesa • Trusted by millions worldwide</span>
+          </div>
         </div>
       </CardContent>
     </Card>

@@ -3,10 +3,11 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
 import CartItemComponent, { CartItem } from '@/components/CartItem';
-import MpesaPayment from '@/components/MpesaPayment';
-import { ShoppingBag, ArrowLeft } from 'lucide-react';
+import PaymentOptions from '@/components/PaymentOptions';
+import { useDiscount } from '@/hooks/useDiscount';
+import { ShoppingBag, ArrowLeft, Zap, Users, Timer } from 'lucide-react';
 
 interface CartProps {
   cartItems: CartItem[];
@@ -16,12 +17,29 @@ interface CartProps {
 }
 
 const Cart = ({ cartItems, onUpdateQuantity, onRemoveFromCart, cartTotal }: CartProps) => {
-  const [showMpesaPayment, setShowMpesaPayment] = useState(false);
+  const [showPaymentOptions, setShowPaymentOptions] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [discountClaimed, setDiscountClaimed] = useState(false);
+  
+  const { 
+    isEligible, 
+    discountPercentage, 
+    remainingSlots, 
+    claimDiscount,
+    calculateDiscountedPrice,
+    getDiscountAmount 
+  } = useDiscount();
+
+  const discountedTotal = isEligible ? calculateDiscountedPrice(cartTotal) : cartTotal;
+  const discountAmount = getDiscountAmount(cartTotal);
 
   const handlePaymentSuccess = () => {
+    if (isEligible && !discountClaimed) {
+      claimDiscount();
+      setDiscountClaimed(true);
+    }
     setPaymentSuccess(true);
-    setShowMpesaPayment(false);
+    setShowPaymentOptions(false);
     // Clear cart after successful payment
     cartItems.forEach(item => onRemoveFromCart(item.id));
   };
@@ -78,10 +96,37 @@ const Cart = ({ cartItems, onUpdateQuantity, onRemoveFromCart, cartTotal }: Cart
               <CardTitle>Order Summary</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* Early Bird Discount Banner */}
+              {isEligible && (
+                <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white p-4 rounded-lg">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Zap className="w-5 h-5" />
+                    <span className="font-bold">Early Bird Special!</span>
+                  </div>
+                  <p className="text-sm mb-2">
+                    Get {discountPercentage}% OFF as one of our first 10,000 customers!
+                  </p>
+                  <div className="flex items-center gap-2 text-xs">
+                    <Users className="w-4 h-4" />
+                    <span>{remainingSlots.toLocaleString()} spots remaining</span>
+                  </div>
+                </div>
+              )}
+
               <div className="flex justify-between text-sm">
                 <span>Items ({cartItems.reduce((sum, item) => sum + item.quantity, 0)})</span>
                 <span>KSh {cartTotal.toLocaleString()}</span>
               </div>
+              
+              {isEligible && discountAmount > 0 && (
+                <div className="flex justify-between text-sm text-green-600">
+                  <span className="flex items-center gap-1">
+                    <Zap className="w-3 h-3" />
+                    Early Bird Discount ({discountPercentage}%)
+                  </span>
+                  <span>-KSh {discountAmount.toLocaleString()}</span>
+                </div>
+              )}
               
               <div className="flex justify-between text-sm">
                 <span>Delivery</span>
@@ -91,39 +136,48 @@ const Cart = ({ cartItems, onUpdateQuantity, onRemoveFromCart, cartTotal }: Cart
               <div className="border-t pt-4">
                 <div className="flex justify-between font-bold text-lg">
                   <span>Total</span>
-                  <span>KSh {cartTotal.toLocaleString()}</span>
+                  <div className="text-right">
+                    {isEligible && discountAmount > 0 ? (
+                      <>
+                        <div className="text-sm text-muted-foreground line-through">
+                          KSh {cartTotal.toLocaleString()}
+                        </div>
+                        <div className="text-primary">
+                          KSh {discountedTotal.toLocaleString()}
+                        </div>
+                      </>
+                    ) : (
+                      <span>KSh {cartTotal.toLocaleString()}</span>
+                    )}
+                  </div>
                 </div>
               </div>
 
               <Button 
-                className="w-full mt-6 bg-mpesa hover:bg-mpesa/90 text-mpesa-foreground" 
+                className="w-full mt-6" 
                 size="lg"
-                onClick={() => setShowMpesaPayment(true)}
+                onClick={() => setShowPaymentOptions(true)}
               >
-                Pay with M-Pesa
+                Proceed to Checkout
               </Button>
 
               <p className="text-xs text-gray-500 text-center mt-4">
-                Secure checkout powered by M-Pesa
+                Multiple payment options • Secure checkout
               </p>
             </CardContent>
           </Card>
         </div>
       </div>
 
-      {/* M-Pesa Payment Dialog */}
-      <Dialog open={showMpesaPayment} onOpenChange={setShowMpesaPayment}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="sr-only">M-Pesa Payment</DialogTitle>
-          </DialogHeader>
-          <MpesaPayment 
-            amount={cartTotal}
-            onPaymentSuccess={handlePaymentSuccess}
-            onCancel={() => setShowMpesaPayment(false)}
-          />
-        </DialogContent>
-      </Dialog>
+      {/* Payment Options */}
+      <PaymentOptions 
+        amount={cartTotal}
+        discountedAmount={isEligible ? discountedTotal : undefined}
+        onPaymentSuccess={handlePaymentSuccess}
+        onCancel={() => setShowPaymentOptions(false)}
+        open={showPaymentOptions}
+        onOpenChange={setShowPaymentOptions}
+      />
 
       {/* Payment Success Message */}
       {paymentSuccess && (
@@ -136,7 +190,7 @@ const Cart = ({ cartItems, onUpdateQuantity, onRemoveFromCart, cartTotal }: Cart
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Order Confirmed! 🎉</h2>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Order Confirmed!</h2>
                 <p className="text-gray-600 mb-6">
                   Thank you for your purchase. Your order has been confirmed and will be processed shortly.
                 </p>

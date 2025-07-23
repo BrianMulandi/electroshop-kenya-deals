@@ -10,6 +10,7 @@ import Home from "@/pages/Home";
 import Products from "@/pages/Products";
 import Cart from "@/pages/Cart";
 import NotFound from "./pages/NotFound";
+import { MapPin, ShoppingBag, CreditCard, Truck, Star, Mail, Phone, Smartphone, Building } from "lucide-react";
 
 const queryClient = new QueryClient();
 
@@ -49,8 +50,9 @@ const AppContent = () => {
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-8 text-center md:text-left">
             <div>
-              <h3 className="text-xl font-bold mb-4 flex items-center justify-center md:justify-start">
-                🇰🇪 ElectroShop Kenya
+              <h3 className="text-xl font-bold mb-4 flex items-center justify-center md:justify-start gap-2">
+                <MapPin className="w-5 h-5 text-primary" />
+                ElectroShop Kenya
               </h3>
               <p className="text-accent-foreground/80">
                 Your trusted electronics partner since 2020. 
@@ -60,24 +62,24 @@ const AppContent = () => {
             <div>
               <h4 className="font-semibold mb-4">Quick Links</h4>
               <div className="space-y-2 text-accent-foreground/80">
-                <p>🛍️ Shop Electronics</p>
-                <p>💳 M-Pesa Payments</p>
-                <p>🚚 Delivery Info</p>
-                <p>⭐ Customer Reviews</p>
+                <p className="flex items-center gap-2"><ShoppingBag className="w-4 h-4" /> Shop Electronics</p>
+                <p className="flex items-center gap-2"><CreditCard className="w-4 h-4" /> Multiple Payment Options</p>
+                <p className="flex items-center gap-2"><Truck className="w-4 h-4" /> Delivery Info</p>
+                <p className="flex items-center gap-2"><Star className="w-4 h-4" /> Customer Reviews</p>
               </div>
             </div>
             <div>
               <h4 className="font-semibold mb-4">Contact Us</h4>
               <div className="space-y-2 text-accent-foreground/80">
-                <p>📧 support@electroshop.co.ke</p>
-                <p>📱 +254 712 345 678</p>
-                <p>💰 M-Pesa: 0704137949</p>
-                <p>🏢 Nairobi, Kenya</p>
+                <p className="flex items-center gap-2"><Mail className="w-4 h-4" /> support@electroshop.co.ke</p>
+                <p className="flex items-center gap-2"><Phone className="w-4 h-4" /> +254 712 345 678</p>
+                <p className="flex items-center gap-2"><Smartphone className="w-4 h-4" /> M-Pesa: 0704137949</p>
+                <p className="flex items-center gap-2"><Building className="w-4 h-4" /> Nairobi, Kenya</p>
               </div>
             </div>
           </div>
           <div className="border-t border-accent-foreground/20 mt-8 pt-8 text-center text-accent-foreground/60">
-            <p>&copy; 2025 ElectroShop Kenya. All rights reserved. Made with ❤️ for Kenya.</p>
+            <p>&copy; 2025 ElectroShop Kenya. All rights reserved. Crafted with excellence for Kenya and the world.</p>
           </div>
         </div>
       </footer>
